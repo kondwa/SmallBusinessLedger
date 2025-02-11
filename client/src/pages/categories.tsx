@@ -58,12 +58,12 @@ export default function CategoriesPage() {
   });
 
   const createCategory = useMutation({
-    mutationFn: async (data: Omit<Category, "id" | "userId">) => {
+    mutationFn: async (data: { name: string; type: "income" | "expense" }) => {
       try {
-        console.log("Submitting category data:", data);
+        console.log("Creating category with data:", data);
         const res = await apiRequest("POST", "/api/categories", data);
         const result = await res.json();
-        console.log("Server response:", result);
+        console.log("Category created:", result);
         return result;
       } catch (error) {
         console.error("Error creating category:", error);
@@ -100,11 +100,6 @@ export default function CategoriesPage() {
       </div>
     );
   }
-
-  const onSubmit = (data: { name: string; type: string }) => {
-    console.log("Form submitted with data:", data);
-    createCategory.mutate(data);
-  };
 
   return (
     <div className="flex h-screen">
