@@ -8,6 +8,7 @@ import {
   ArrowLeftRightIcon,
   LogOutIcon,
   TagsIcon,
+  BarChart2Icon,
 } from "lucide-react";
 
 const navigation = [
@@ -15,6 +16,7 @@ const navigation = [
   { name: "Transactions", href: "/transactions", icon: ArrowLeftRightIcon },
   { name: "Categories", href: "/categories", icon: TagsIcon },
   { name: "Invoices", href: "/invoices", icon: ReceiptIcon },
+  { name: "Analytics", href: "/analytics", icon: BarChart2Icon },
 ];
 
 export default function Sidebar() {

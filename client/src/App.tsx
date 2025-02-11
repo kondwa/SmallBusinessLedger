@@ -10,6 +10,7 @@ import HomePage from "@/pages/home-page";
 import TransactionsPage from "@/pages/transactions";
 import InvoicesPage from "@/pages/invoices";
 import CategoriesPage from "@/pages/categories";
+import AnalyticsPage from "@/pages/analytics";
 
 function Router() {
   return (
@@ -19,6 +20,7 @@ function Router() {
       <ProtectedRoute path="/transactions" component={TransactionsPage} />
       <ProtectedRoute path="/invoices" component={InvoicesPage} />
       <ProtectedRoute path="/categories" component={CategoriesPage} />
+      <ProtectedRoute path="/analytics" component={AnalyticsPage} />
       <Route component={NotFound} />
     </Switch>
   );
