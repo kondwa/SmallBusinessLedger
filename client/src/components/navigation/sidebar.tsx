@@ -7,11 +7,13 @@ import {
   ReceiptIcon,
   ArrowLeftRightIcon,
   LogOutIcon,
+  TagsIcon,
 } from "lucide-react";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: HomeIcon },
   { name: "Transactions", href: "/transactions", icon: ArrowLeftRightIcon },
+  { name: "Categories", href: "/categories", icon: TagsIcon },
   { name: "Invoices", href: "/invoices", icon: ReceiptIcon },
 ];
 
