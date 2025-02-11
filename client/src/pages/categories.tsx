@@ -20,6 +20,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -127,6 +128,9 @@ export default function CategoriesPage() {
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>New Category</DialogTitle>
+                  <DialogDescription>
+                    Add a new category for organizing your transactions.
+                  </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
                   <form
