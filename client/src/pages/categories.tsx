@@ -58,7 +58,7 @@ export default function CategoriesPage() {
   });
 
   const createCategory = useMutation({
-    mutationFn: async (data: Omit<Category, "id" | "userId">) => {
+    mutationFn: async (data: { name: string; type: string }) => {
       const res = await apiRequest("POST", "/api/categories", data);
       return res.json();
     },
@@ -115,9 +115,7 @@ export default function CategoriesPage() {
                 </DialogHeader>
                 <Form {...form}>
                   <form
-                    onSubmit={form.handleSubmit((data) =>
-                      createCategory.mutate(data)
-                    )}
+                    onSubmit={form.handleSubmit((data) => createCategory.mutate(data))}
                     className="space-y-4"
                   >
                     <FormField
