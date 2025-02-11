@@ -39,14 +39,17 @@ import {
 import Sidebar from "@/components/navigation/sidebar";
 import { Loader2, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function CategoriesPage() {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const { data: categories = [], isLoading } = useQuery<Category[]>({
     queryKey: ["/api/categories"],
+    enabled: !!user, // Only fetch when user is authenticated
   });
 
   const form = useForm({
@@ -59,6 +62,9 @@ export default function CategoriesPage() {
 
   const createCategory = useMutation({
     mutationFn: async (data: { name: string; type: "income" | "expense" }) => {
+      if (!user) {
+        throw new Error("You must be logged in to create categories");
+      }
       try {
         console.log("Creating category with data:", data);
         const res = await apiRequest("POST", "/api/categories", data);
