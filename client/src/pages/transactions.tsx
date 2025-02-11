@@ -4,6 +4,7 @@ import { Transaction, Category, insertTransactionSchema } from "@shared/schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/use-auth"; // Add useAuth hook
 import {
   Table,
   TableBody,
@@ -39,10 +40,12 @@ import {
 import { format } from "date-fns";
 import Sidebar from "@/components/navigation/sidebar";
 import { Loader2, Plus } from "lucide-react";
+import { CurrencySelect } from "@/components/ui/currency-select"; // Fix import path
 
 export default function TransactionsPage() {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const { user } = useAuth(); // Get user from auth context
 
   const { data: transactions = [], isLoading: transactionsLoading } = useQuery<
     Transaction[]
@@ -63,13 +66,19 @@ export default function TransactionsPage() {
       description: "",
       type: "expense",
       categoryId: 0,
-      date: new Date().toISOString().split('T')[0],
+      date: new Date(),
+      currency: user?.defaultCurrency || "USD",
     },
   });
 
   const createTransaction = useMutation({
     mutationFn: async (data: Omit<Transaction, "id" | "userId">) => {
-      const res = await apiRequest("POST", "/api/transactions", data);
+      const formattedData = {
+        ...data,
+        date: new Date(data.date), // Ensure date is properly formatted
+        amount: data.amount.toString(), // Ensure amount is string
+      };
+      const res = await apiRequest("POST", "/api/transactions", formattedData);
       return res.json();
     },
     onSuccess: () => {
@@ -81,7 +90,7 @@ export default function TransactionsPage() {
 
   // Watch the transaction type to filter categories
   const transactionType = form.watch("type");
-  const filteredCategories = categories.filter(c => c.type === transactionType);
+  const filteredCategories = categories.filter((c) => c.type === transactionType);
 
   if (transactionsLoading || categoriesLoading) {
     return (
@@ -151,12 +160,27 @@ export default function TransactionsPage() {
                           <FormLabel>Amount</FormLabel>
                           <FormControl>
                             <Input
-                              type="text" // Changed to text
+                              type="text"
                               step="0.01"
                               {...field}
                               onChange={(e) => field.onChange(e.target.value)}
                             />
                           </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="currency"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Currency</FormLabel>
+                          <CurrencySelect
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            defaultCurrency={user?.defaultCurrency}
+                          />
                           <FormMessage />
                         </FormItem>
                       )}
@@ -206,6 +230,23 @@ export default function TransactionsPage() {
                         </FormItem>
                       )}
                     />
+                    <FormField
+                      control={form.control}
+                      name="date"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Date</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="date"
+                              {...field}
+                              value={field.value instanceof Date ? field.value.toISOString().split('T')[0] : field.value}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                     <Button
                       type="submit"
                       className="w-full"
@@ -250,14 +291,15 @@ export default function TransactionsPage() {
                     </TableCell>
                     <TableCell>{transaction.description}</TableCell>
                     <TableCell>
-                      {
-                        categories.find((c) => c.id === transaction.categoryId)
-                          ?.name
-                      }
+                      {categories.find((c) => c.id === transaction.categoryId)
+                        ?.name}
                     </TableCell>
-                    <TableCell className="capitalize">{transaction.type}</TableCell>
+                    <TableCell className="capitalize">
+                      {transaction.type}
+                    </TableCell>
                     <TableCell className="text-right">
-                      ${Number(transaction.amount).toFixed(2)}
+                      {transaction.currency}{" "}
+                      {Number(transaction.amount).toFixed(2)}
                     </TableCell>
                   </TableRow>
                 ))}

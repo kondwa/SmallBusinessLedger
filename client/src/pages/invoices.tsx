@@ -4,6 +4,7 @@ import { Invoice, insertInvoiceSchema } from "@shared/schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/use-auth";
 import {
   Table,
   TableBody,
@@ -39,10 +40,12 @@ import {
 import { format } from "date-fns";
 import Sidebar from "@/components/navigation/sidebar";
 import { Loader2, Plus } from "lucide-react";
+import { CurrencySelect } from "@/components/ui/currency-select";
 
 export default function InvoicesPage() {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const { user } = useAuth();
 
   const { data: invoices = [], isLoading } = useQuery<Invoice[]>({
     queryKey: ["/api/invoices"],
@@ -56,12 +59,19 @@ export default function InvoicesPage() {
       status: "pending",
       dueDate: new Date(),
       createdAt: new Date(),
+      currency: user?.defaultCurrency || "USD",
     },
   });
 
   const createInvoice = useMutation({
     mutationFn: async (data: Omit<Invoice, "id" | "userId">) => {
-      const res = await apiRequest("POST", "/api/invoices", data);
+      const formattedData = {
+        ...data,
+        amount: data.amount.toString(),
+        dueDate: new Date(data.dueDate),
+        createdAt: new Date(),
+      };
+      const res = await apiRequest("POST", "/api/invoices", formattedData);
       return res.json();
     },
     onSuccess: () => {
@@ -134,12 +144,27 @@ export default function InvoicesPage() {
                           <FormLabel>Amount</FormLabel>
                           <FormControl>
                             <Input
-                              type="number"
+                              type="text"
                               step="0.01"
                               {...field}
                               onChange={(e) => field.onChange(e.target.value)}
                             />
                           </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="currency"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Currency</FormLabel>
+                          <CurrencySelect
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            defaultCurrency={user?.defaultCurrency}
+                          />
                           <FormMessage />
                         </FormItem>
                       )}
@@ -219,7 +244,8 @@ export default function InvoicesPage() {
                       {invoice.status}
                     </TableCell>
                     <TableCell className="text-right">
-                      ${Number(invoice.amount).toFixed(2)}
+                      {invoice.currency}{" "}
+                      {Number(invoice.amount).toFixed(2)}
                     </TableCell>
                   </TableRow>
                 ))}
