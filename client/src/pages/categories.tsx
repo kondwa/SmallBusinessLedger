@@ -97,6 +97,18 @@ export default function CategoriesPage() {
     },
   });
 
+  const handleSubmit = form.handleSubmit((data) => {
+    console.log("Form submitted with data:", data);
+    console.log("Form validation state:", form.formState);
+
+    if (form.formState.errors) {
+      console.log("Form errors:", form.formState.errors);
+      return;
+    }
+
+    createCategory.mutate(data as { name: string; type: "income" | "expense" });
+  });
+
   const filteredCategories = categories.filter((c) =>
     c.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -135,10 +147,7 @@ export default function CategoriesPage() {
                 </DialogHeader>
                 <Form {...form}>
                   <form
-                    onSubmit={form.handleSubmit((data) => {
-                      console.log("Form submitted with data:", data);
-                      createCategory.mutate(data as { name: string; type: "income" | "expense" });
-                    })}
+                    onSubmit={handleSubmit}
                     className="space-y-4"
                   >
                     <FormField
