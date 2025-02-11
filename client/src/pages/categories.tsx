@@ -50,7 +50,7 @@ export default function CategoriesPage() {
 
   const { data: categories = [], isLoading } = useQuery<Category[]>({
     queryKey: ["/api/categories"],
-    enabled: !!user, // Only fetch when user is authenticated
+    enabled: !!user,
   });
 
   const form = useForm({
@@ -66,16 +66,17 @@ export default function CategoriesPage() {
       if (!user) {
         throw new Error("You must be logged in to create categories");
       }
-      try {
-        console.log("Creating category with data:", data);
-        const res = await apiRequest("POST", "/api/categories", data);
-        const result = await res.json();
-        console.log("Category created:", result);
-        return result;
-      } catch (error) {
-        console.error("Error creating category:", error);
-        throw error;
+
+      console.log("Submitting category data:", data);
+      const res = await apiRequest("POST", "/api/categories", data);
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error("Server error response:", errorData);
+        throw new Error(errorData.message || "Failed to create category");
       }
+
+      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/categories"] });
@@ -87,10 +88,10 @@ export default function CategoriesPage() {
       });
     },
     onError: (error: Error) => {
-      console.error("Mutation error:", error);
+      console.error("Category creation error:", error);
       toast({
-        title: "Error",
-        description: error.message || "Failed to create category",
+        title: "Error creating category",
+        description: error.message,
         variant: "destructive",
       });
     },
@@ -136,7 +137,7 @@ export default function CategoriesPage() {
                   <form
                     onSubmit={form.handleSubmit((data) => {
                       console.log("Form submitted with data:", data);
-                      createCategory.mutate(data);
+                      createCategory.mutate(data as { name: string; type: "income" | "expense" });
                     })}
                     className="space-y-4"
                   >

@@ -22,14 +22,33 @@ export function registerRoutes(app: Express): Server {
   app.post("/api/categories", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     try {
-      console.log("Received category creation request:", req.body);
-      const parsed = insertCategorySchema.parse({ ...req.body, userId: req.user.id });
+      console.log("Category creation request - User:", req.user.id);
+      console.log("Request body:", req.body);
+
+      const categoryData = {
+        ...req.body,
+        userId: req.user.id
+      };
+
+      console.log("Validating category data:", categoryData);
+      const parsed = insertCategorySchema.parse(categoryData);
+
+      console.log("Creating category with parsed data:", parsed);
       const category = await storage.createCategory(parsed);
-      console.log("Created category:", category);
+
+      console.log("Category created successfully:", category);
       res.status(201).json(category);
     } catch (error) {
       console.error("Error creating category:", error);
-      res.status(400).json({ message: error instanceof Error ? error.message : "Failed to create category" });
+      if (error instanceof Error) {
+        res.status(400).json({ 
+          message: "Failed to create category", 
+          error: error.message,
+          details: error.stack 
+        });
+      } else {
+        res.status(400).json({ message: "Failed to create category" });
+      }
     }
   });
 
