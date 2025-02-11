@@ -59,17 +59,20 @@ export default function TransactionsPage() {
   const form = useForm({
     resolver: zodResolver(insertTransactionSchema),
     defaultValues: {
-      amount: 0,
+      amount: "0",
       description: "",
       type: "expense",
-      categoryId: undefined,
-      date: new Date(),
+      categoryId: 0,
+      date: new Date().toISOString(),
     },
   });
 
   const createTransaction = useMutation({
     mutationFn: async (data: Omit<Transaction, "id" | "userId">) => {
-      const res = await apiRequest("POST", "/api/transactions", data);
+      const res = await apiRequest("POST", "/api/transactions", {
+        ...data,
+        amount: parseFloat(data.amount), //Parse the amount before sending
+      });
       return res.json();
     },
     onSuccess: () => {
@@ -154,10 +157,9 @@ export default function TransactionsPage() {
                           <FormControl>
                             <Input
                               type="number"
+                              step="0.01"
                               {...field}
-                              onChange={(e) =>
-                                field.onChange(parseFloat(e.target.value))
-                              }
+                              onChange={(e) => field.onChange(e.target.value)}
                             />
                           </FormControl>
                           <FormMessage />
@@ -187,7 +189,7 @@ export default function TransactionsPage() {
                             onValueChange={(value) =>
                               field.onChange(parseInt(value))
                             }
-                            defaultValue={field.value?.toString()}
+                            value={field.value?.toString()}
                           >
                             <FormControl>
                               <SelectTrigger>
@@ -195,14 +197,16 @@ export default function TransactionsPage() {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {categories.map((category) => (
-                                <SelectItem
-                                  key={category.id}
-                                  value={category.id.toString()}
-                                >
-                                  {category.name}
-                                </SelectItem>
-                              ))}
+                              {categories
+                                .filter((c) => c.type === form.getValues("type"))
+                                .map((category) => (
+                                  <SelectItem
+                                    key={category.id}
+                                    value={category.id.toString()}
+                                  >
+                                    {category.name}
+                                  </SelectItem>
+                                ))}
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -260,7 +264,7 @@ export default function TransactionsPage() {
                     </TableCell>
                     <TableCell className="capitalize">{transaction.type}</TableCell>
                     <TableCell className="text-right">
-                      ${transaction.amount.toFixed(2)}
+                      ${parseFloat(transaction.amount).toFixed(2)}
                     </TableCell>
                   </TableRow>
                 ))}
