@@ -41,7 +41,17 @@ export const insertUserSchema = createInsertSchema(users).extend({
 });
 
 export const insertCategorySchema = createInsertSchema(categories);
-export const insertTransactionSchema = createInsertSchema(transactions);
+export const insertTransactionSchema = createInsertSchema(transactions)
+  .extend({
+    // Ensure amount is handled as a string for form input
+    amount: z.string().transform((val) => parseFloat(val)),
+    // Ensure categoryId is a number
+    categoryId: z.number().int().positive(),
+    // Ensure date is properly handled
+    date: z.string().transform((val) => new Date(val)),
+    // Validate transaction type
+    type: z.enum(["income", "expense"])
+  });
 export const insertInvoiceSchema = createInsertSchema(invoices);
 
 export type InsertUser = z.infer<typeof insertUserSchema>;

@@ -69,10 +69,7 @@ export default function TransactionsPage() {
 
   const createTransaction = useMutation({
     mutationFn: async (data: Omit<Transaction, "id" | "userId">) => {
-      const res = await apiRequest("POST", "/api/transactions", {
-        ...data,
-        amount: parseFloat(data.amount), //Parse the amount before sending
-      });
+      const res = await apiRequest("POST", "/api/transactions", data);
       return res.json();
     },
     onSuccess: () => {
@@ -82,11 +79,9 @@ export default function TransactionsPage() {
     },
   });
 
-  const filteredTransactions = transactions.filter(
-    (t) =>
-      t.description.toLowerCase().includes(search.toLowerCase()) ||
-      t.amount.toString().includes(search)
-  );
+  // Watch the transaction type to filter categories
+  const transactionType = form.watch("type");
+  const filteredCategories = categories.filter(c => c.type === transactionType);
 
   if (transactionsLoading || categoriesLoading) {
     return (
@@ -159,7 +154,6 @@ export default function TransactionsPage() {
                               type="number"
                               step="0.01"
                               {...field}
-                              onChange={(e) => field.onChange(e.target.value)}
                             />
                           </FormControl>
                           <FormMessage />
@@ -197,16 +191,14 @@ export default function TransactionsPage() {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {categories
-                                .filter((c) => c.type === form.getValues("type"))
-                                .map((category) => (
-                                  <SelectItem
-                                    key={category.id}
-                                    value={category.id.toString()}
-                                  >
-                                    {category.name}
-                                  </SelectItem>
-                                ))}
+                              {filteredCategories.map((category) => (
+                                <SelectItem
+                                  key={category.id}
+                                  value={category.id.toString()}
+                                >
+                                  {category.name}
+                                </SelectItem>
+                              ))}
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -250,7 +242,7 @@ export default function TransactionsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredTransactions.map((transaction) => (
+                {transactions.map((transaction) => (
                   <TableRow key={transaction.id}>
                     <TableCell>
                       {format(new Date(transaction.date), "MMM d, yyyy")}
