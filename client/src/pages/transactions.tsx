@@ -59,11 +59,11 @@ export default function TransactionsPage() {
   const form = useForm({
     resolver: zodResolver(insertTransactionSchema),
     defaultValues: {
-      amount: "0",
+      amount: "",
       description: "",
       type: "expense",
       categoryId: 0,
-      date: new Date().toISOString(),
+      date: new Date().toISOString().split('T')[0],
     },
   });
 
@@ -151,9 +151,10 @@ export default function TransactionsPage() {
                           <FormLabel>Amount</FormLabel>
                           <FormControl>
                             <Input
-                              type="number"
+                              type="text" // Changed to text
                               step="0.01"
                               {...field}
+                              onChange={(e) => field.onChange(e.target.value)}
                             />
                           </FormControl>
                           <FormMessage />
@@ -256,7 +257,7 @@ export default function TransactionsPage() {
                     </TableCell>
                     <TableCell className="capitalize">{transaction.type}</TableCell>
                     <TableCell className="text-right">
-                      ${parseFloat(transaction.amount).toFixed(2)}
+                      ${Number(transaction.amount).toFixed(2)}
                     </TableCell>
                   </TableRow>
                 ))}

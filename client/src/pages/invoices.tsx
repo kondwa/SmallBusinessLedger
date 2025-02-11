@@ -52,7 +52,7 @@ export default function InvoicesPage() {
     resolver: zodResolver(insertInvoiceSchema),
     defaultValues: {
       clientName: "",
-      amount: 0,
+      amount: "",
       status: "pending",
       dueDate: new Date(),
       createdAt: new Date(),
@@ -135,10 +135,9 @@ export default function InvoicesPage() {
                           <FormControl>
                             <Input
                               type="number"
+                              step="0.01"
                               {...field}
-                              onChange={(e) =>
-                                field.onChange(parseFloat(e.target.value))
-                              }
+                              onChange={(e) => field.onChange(e.target.value)}
                             />
                           </FormControl>
                           <FormMessage />
@@ -216,9 +215,11 @@ export default function InvoicesPage() {
                       {format(new Date(invoice.dueDate), "MMM d, yyyy")}
                     </TableCell>
                     <TableCell>{invoice.clientName}</TableCell>
-                    <TableCell className="capitalize">{invoice.status}</TableCell>
+                    <TableCell className="capitalize">
+                      {invoice.status}
+                    </TableCell>
                     <TableCell className="text-right">
-                      ${invoice.amount.toFixed(2)}
+                      ${Number(invoice.amount).toFixed(2)}
                     </TableCell>
                   </TableRow>
                 ))}
