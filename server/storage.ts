@@ -1,85 +1,67 @@
 import { IStorage } from "./types";
 import {
   User, InsertUser, Category, Transaction, Invoice,
-  categories, transactions, invoices
+  users, categories, transactions, invoices
 } from "@shared/schema";
 import session from "express-session";
-import createMemoryStore from "memorystore";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
+import connectPg from "connect-pg-simple";
+import { pool } from "./db";
 
-const MemoryStore = createMemoryStore(session);
+const PostgresSessionStore = connectPg(session);
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private categories: Map<number, Category>;
-  private transactions: Map<number, Transaction>;
-  private invoices: Map<number, Invoice>;
-  private currentId: { [key: string]: number };
+export class DatabaseStorage implements IStorage {
   sessionStore: session.Store;
 
   constructor() {
-    this.users = new Map();
-    this.categories = new Map();
-    this.transactions = new Map();
-    this.invoices = new Map();
-    this.currentId = { users: 1, categories: 1, transactions: 1, invoices: 1 };
-    this.sessionStore = new MemoryStore({ checkPeriod: 86400000 });
+    this.sessionStore = new PostgresSessionStore({
+      pool,
+      createTableIfMissing: true,
+    });
   }
 
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
   }
 
   async createUser(user: InsertUser): Promise<User> {
-    const id = this.currentId.users++;
-    const newUser = { ...user, id };
-    this.users.set(id, newUser);
+    const [newUser] = await db.insert(users).values(user).returning();
     return newUser;
   }
 
   async createCategory(category: Omit<Category, "id">): Promise<Category> {
-    const id = this.currentId.categories++;
-    const newCategory = { ...category, id };
-    this.categories.set(id, newCategory);
+    const [newCategory] = await db.insert(categories).values(category).returning();
     return newCategory;
   }
 
   async getCategoriesByUserId(userId: number): Promise<Category[]> {
-    return Array.from(this.categories.values()).filter(
-      (category) => category.userId === userId
-    );
+    return db.select().from(categories).where(eq(categories.userId, userId));
   }
 
   async createTransaction(transaction: Omit<Transaction, "id">): Promise<Transaction> {
-    const id = this.currentId.transactions++;
-    const newTransaction = { ...transaction, id };
-    this.transactions.set(id, newTransaction);
+    const [newTransaction] = await db.insert(transactions).values(transaction).returning();
     return newTransaction;
   }
 
   async getTransactionsByUserId(userId: number): Promise<Transaction[]> {
-    return Array.from(this.transactions.values()).filter(
-      (transaction) => transaction.userId === userId
-    );
+    return db.select().from(transactions).where(eq(transactions.userId, userId));
   }
 
   async createInvoice(invoice: Omit<Invoice, "id">): Promise<Invoice> {
-    const id = this.currentId.invoices++;
-    const newInvoice = { ...invoice, id };
-    this.invoices.set(id, newInvoice);
+    const [newInvoice] = await db.insert(invoices).values(invoice).returning();
     return newInvoice;
   }
 
   async getInvoicesByUserId(userId: number): Promise<Invoice[]> {
-    return Array.from(this.invoices.values()).filter(
-      (invoice) => invoice.userId === userId
-    );
+    return db.select().from(invoices).where(eq(invoices.userId, userId));
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
