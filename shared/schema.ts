@@ -40,7 +40,12 @@ export const insertUserSchema = createInsertSchema(users).extend({
   businessName: z.string().min(1, "Business name is required"),
 });
 
-export const insertCategorySchema = createInsertSchema(categories);
+export const insertCategorySchema = createInsertSchema(categories).extend({
+  name: z.string().min(1, "Category name is required"),
+  type: z.enum(["income", "expense"], {
+    required_error: "Type must be either income or expense",
+  }),
+});
 export const insertTransactionSchema = createInsertSchema(transactions)
   .extend({
     // Ensure amount is handled as a decimal string

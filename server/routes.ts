@@ -10,15 +10,27 @@ export function registerRoutes(app: Express): Server {
   // Categories
   app.get("/api/categories", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    const categories = await storage.getCategoriesByUserId(req.user.id);
-    res.json(categories);
+    try {
+      const categories = await storage.getCategoriesByUserId(req.user.id);
+      res.json(categories);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      res.status(500).json({ message: "Failed to fetch categories" });
+    }
   });
 
   app.post("/api/categories", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    const parsed = insertCategorySchema.parse({ ...req.body, userId: req.user.id });
-    const category = await storage.createCategory(parsed);
-    res.status(201).json(category);
+    try {
+      console.log("Received category creation request:", req.body);
+      const parsed = insertCategorySchema.parse({ ...req.body, userId: req.user.id });
+      const category = await storage.createCategory(parsed);
+      console.log("Created category:", category);
+      res.status(201).json(category);
+    } catch (error) {
+      console.error("Error creating category:", error);
+      res.status(400).json({ message: error instanceof Error ? error.message : "Failed to create category" });
+    }
   });
 
   // Transactions

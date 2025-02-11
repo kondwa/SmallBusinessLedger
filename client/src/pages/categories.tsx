@@ -58,9 +58,17 @@ export default function CategoriesPage() {
   });
 
   const createCategory = useMutation({
-    mutationFn: async (data: { name: string; type: string }) => {
-      const res = await apiRequest("POST", "/api/categories", data);
-      return res.json();
+    mutationFn: async (data: Omit<Category, "id" | "userId">) => {
+      try {
+        console.log("Submitting category data:", data);
+        const res = await apiRequest("POST", "/api/categories", data);
+        const result = await res.json();
+        console.log("Server response:", result);
+        return result;
+      } catch (error) {
+        console.error("Error creating category:", error);
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/categories"] });
@@ -72,9 +80,10 @@ export default function CategoriesPage() {
       });
     },
     onError: (error: Error) => {
+      console.error("Mutation error:", error);
       toast({
         title: "Error",
-        description: error.message,
+        description: error.message || "Failed to create category",
         variant: "destructive",
       });
     },
@@ -91,6 +100,11 @@ export default function CategoriesPage() {
       </div>
     );
   }
+
+  const onSubmit = (data: { name: string; type: string }) => {
+    console.log("Form submitted with data:", data);
+    createCategory.mutate(data);
+  };
 
   return (
     <div className="flex h-screen">
@@ -115,7 +129,10 @@ export default function CategoriesPage() {
                 </DialogHeader>
                 <Form {...form}>
                   <form
-                    onSubmit={form.handleSubmit((data) => createCategory.mutate(data))}
+                    onSubmit={form.handleSubmit((data) => {
+                      console.log("Form submitted with data:", data);
+                      createCategory.mutate(data);
+                    })}
                     className="space-y-4"
                   >
                     <FormField
