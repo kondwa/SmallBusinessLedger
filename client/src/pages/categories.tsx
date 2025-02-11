@@ -38,10 +38,12 @@ import {
 } from "@/components/ui/select";
 import Sidebar from "@/components/navigation/sidebar";
 import { Loader2, Plus } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function CategoriesPage() {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const { toast } = useToast();
 
   const { data: categories = [], isLoading } = useQuery<Category[]>({
     queryKey: ["/api/categories"],
@@ -64,6 +66,17 @@ export default function CategoriesPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/categories"] });
       form.reset();
       setOpen(false);
+      toast({
+        title: "Success",
+        description: "Category created successfully",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
     },
   });
 
@@ -128,7 +141,7 @@ export default function CategoriesPage() {
                           <FormLabel>Type</FormLabel>
                           <Select
                             onValueChange={field.onChange}
-                            defaultValue={field.value}
+                            value={field.value}
                           >
                             <FormControl>
                               <SelectTrigger>
