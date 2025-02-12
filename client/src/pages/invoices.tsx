@@ -58,9 +58,10 @@ export default function InvoicesPage() {
       clientName: "",
       amount: "",
       status: "pending",
+      userId: user?.id,
       dueDate: new Date(),
       createdAt: new Date(),
-      currency: user?.defaultCurrency || "USD",
+      currency: user?.defaultCurrency || "MWK",
     },
   });
 
@@ -93,7 +94,13 @@ export default function InvoicesPage() {
   );
 
   const handleSubmit = form.handleSubmit(
-    (data) => createInvoice.mutate(data),
+    (data) => {
+      console.log(data);
+      if (!user) {
+        throw new Error("You must be logged in to create invoices");
+      }
+      createInvoice.mutate({ ...data, userId: user.id });
+    },
     (errors) => console.log("Form errors:", errors),
   );
   if (isLoading) {
