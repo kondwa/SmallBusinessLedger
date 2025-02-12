@@ -115,6 +115,9 @@ export default function InvoicesPage() {
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>New Invoice</DialogTitle>
+                  <DialogDescription>
+                    Create a new invoice by filling out the form below.
+                  </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
                   <form
