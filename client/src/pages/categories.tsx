@@ -63,6 +63,7 @@ export default function CategoriesPage() {
 
   const createCategory = useMutation({
     mutationFn: async (data: { name: string; type: "income" | "expense" }) => {
+      console.log("In create cactegory mutation.");
       if (!user) {
         throw new Error("You must be logged in to create categories");
       }
