@@ -1,0 +1,41 @@
+Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}. Error Component Stack
+    at DescriptionWarning (@radix-ui_react-dialog.js?v=2e63460b:328:29)
+    at @radix-ui_react-dialog.js?v=2e63460b:232:13
+    at @radix-ui_react-dialog.js?v=2e63460b:155:58
+    at Presence (chunk-HHXI44QP.js?v=2e63460b:24:11)
+    at @radix-ui_react-dialog.js?v=2e63460b:146:64
+    at chunk-UACHJROW.js?v=2e63460b:52:11
+    at chunk-UACHJROW.js?v=2e63460b:33:11
+    at chunk-J37UDW3T.js?v=2e63460b:41:13
+    at chunk-KR2FC54L.js?v=2e63460b:258:22
+    at Presence (chunk-HHXI44QP.js?v=2e63460b:24:11)
+    at Provider (chunk-6J5IXUBZ.js?v=2e63460b:48:15)
+    at DialogPortal (@radix-ui_react-dialog.js?v=2e63460b:109:11)
+    at _c3 (dialog.tsx:33:6)
+    at Provider (chunk-6J5IXUBZ.js?v=2e63460b:48:15)
+    at Dialog (@radix-ui_react-dialog.js?v=2e63460b:50:5)
+    at div (<anonymous>)
+    at div (<anonymous>)
+    at main (<anonymous>)
+    at div (<anonymous>)
+    at InvoicesPage (invoices.tsx:46:27)
+    at ProtectedRoute (protected-route.tsx:6:3)
+    at Switch (wouter.js?v=2e63460b:379:17)
+    at Router (<anonymous>)
+    at AuthProvider (use-auth.tsx:23:32)
+    at QueryClientProvider (@tanstack_react-query.js?v=2e63460b:2805:3)
+    at App (<anonymous>)
+overrideMethod @ hook.js:608
+(anonymous) @ @radix-ui_react-dialog.js?v=2e63460b:336
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=2e63460b:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=2e63460b:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=2e63460b:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=2e63460b:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=2e63460b:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=2e63460b:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=2e63460b:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=2e63460b:19416
+commitRoot @ chunk-RPCDYKBN.js?v=2e63460b:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=2e63460b:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=2e63460b:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=2e63460b:18627Understand this warningAI
