@@ -101,7 +101,10 @@ export default function CategoriesPage() {
   const handleSubmit = form.handleSubmit((data) => {
     console.log("Form submitted with data:", data);
     console.log("Form validation state:", form.formState);
-
+    toast({
+      title: "Debug",
+      description: "Form submitted with data: " + JSON.stringify(data),
+    });
     if (form.formState.errors) {
       console.log("Form errors:", form.formState.errors);
       return;
@@ -111,7 +114,7 @@ export default function CategoriesPage() {
   });
 
   const filteredCategories = categories.filter((c) =>
-    c.name.toLowerCase().includes(search.toLowerCase())
+    c.name.toLowerCase().includes(search.toLowerCase()),
   );
 
   if (isLoading) {
@@ -130,7 +133,9 @@ export default function CategoriesPage() {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold tracking-tight">Categories</h1>
-              <p className="text-muted-foreground">Manage transaction categories</p>
+              <p className="text-muted-foreground">
+                Manage transaction categories
+              </p>
             </div>
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
@@ -147,10 +152,7 @@ export default function CategoriesPage() {
                   </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
-                  <form
-                    onSubmit={handleSubmit}
-                    className="space-y-4"
-                  >
+                  <form onSubmit={handleSubmit} className="space-y-4">
                     <FormField
                       control={form.control}
                       name="name"
@@ -225,7 +227,9 @@ export default function CategoriesPage() {
                 {filteredCategories.map((category) => (
                   <TableRow key={category.id}>
                     <TableCell>{category.name}</TableCell>
-                    <TableCell className="capitalize">{category.type}</TableCell>
+                    <TableCell className="capitalize">
+                      {category.type}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
