@@ -21,6 +21,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -65,11 +66,15 @@ export default function InvoicesPage() {
 
   const createInvoice = useMutation({
     mutationFn: async (data: Omit<Invoice, "id" | "userId">) => {
+      if (!user) {
+        throw new Error("You must be logged in to create categories");
+      }
       const formattedData = {
         ...data,
         amount: data.amount.toString(),
         dueDate: new Date(data.dueDate),
         createdAt: new Date(),
+        userId: user.id,
       };
       const res = await apiRequest("POST", "/api/invoices", formattedData);
       return res.json();
@@ -84,9 +89,13 @@ export default function InvoicesPage() {
   const filteredInvoices = invoices.filter(
     (i) =>
       i.clientName.toLowerCase().includes(search.toLowerCase()) ||
-      i.amount.toString().includes(search)
+      i.amount.toString().includes(search),
   );
 
+  const handleSubmit = form.handleSubmit(
+    (data) => createInvoice.mutate(data),
+    (errors) => console.log("Form errors:", errors),
+  );
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -120,12 +129,7 @@ export default function InvoicesPage() {
                   </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
-                  <form
-                    onSubmit={form.handleSubmit((data) =>
-                      createInvoice.mutate(data)
-                    )}
-                    className="space-y-4"
-                  >
+                  <form onSubmit={handleSubmit} className="space-y-4">
                     <FormField
                       control={form.control}
                       name="clientName"
@@ -247,8 +251,7 @@ export default function InvoicesPage() {
                       {invoice.status}
                     </TableCell>
                     <TableCell className="text-right">
-                      {invoice.currency}{" "}
-                      {Number(invoice.amount).toFixed(2)}
+                      {invoice.currency} {Number(invoice.amount).toFixed(2)}
                     </TableCell>
                   </TableRow>
                 ))}

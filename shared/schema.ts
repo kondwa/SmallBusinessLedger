@@ -14,7 +14,7 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   businessName: text("business_name").notNull(),
-  defaultCurrency: text("default_currency").notNull().default("USD"),
+  defaultCurrency: text("default_currency").notNull().default("MWK"),
 });
 
 export const categories = pgTable("categories", {
@@ -98,6 +98,8 @@ export const insertInvoiceSchema = createInsertSchema(invoices).extend({
   status: z.enum(["paid", "pending", "overdue"]),
   // Validate currency
   currency: z.enum(SUPPORTED_CURRENCIES),
+  // Ensure userId is a number
+  userId: z.number().int().positive(),
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
