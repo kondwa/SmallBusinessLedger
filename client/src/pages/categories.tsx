@@ -62,7 +62,7 @@ export default function CategoriesPage() {
   });
 
   const createCategory = useMutation({
-    mutationFn: async (data: { name: string; type: "income" | "expense" }) => {
+    mutationFn: async (data: { name: string; type: string }) => {
       console.log("In create cactegory mutation.");
       if (!user) {
         throw new Error("You must be logged in to create categories");
@@ -98,9 +98,14 @@ export default function CategoriesPage() {
     },
   });
 
-  const handleSubmit = form.handleSubmit((data) => {
-    createCategory.mutate(data as { name: string; type: "income" | "expense" });
-  });
+  const handleSubmit = form.handleSubmit(
+    (data) => {
+      createCategory.mutate(data as { name: string; type: string });
+    },
+    (errors) => {
+      console.log("Form errors:", errors);
+    },
+  );
 
   const filteredCategories = categories.filter((c) =>
     c.name.toLowerCase().includes(search.toLowerCase()),
@@ -141,7 +146,12 @@ export default function CategoriesPage() {
                   </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
-                  <form onSubmit={handleSubmit} className="space-y-4">
+                  <form
+                    onSubmit={async (e) => {
+                      await handleSubmit(e);
+                    }}
+                    className="space-y-4"
+                  >
                     <FormField
                       control={form.control}
                       name="name"
