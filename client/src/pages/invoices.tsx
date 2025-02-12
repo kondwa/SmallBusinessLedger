@@ -65,9 +65,9 @@ export default function InvoicesPage() {
   });
 
   const createInvoice = useMutation({
-    mutationFn: async (data: Omit<Invoice, "id" | "userId">) => {
+    mutationFn: async (data: Omit<Invoice, "id">) => {
       if (!user) {
-        throw new Error("You must be logged in to create categories");
+        throw new Error("You must be logged in to create invoices");
       }
       const formattedData = {
         ...data,
