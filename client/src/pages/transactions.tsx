@@ -120,6 +120,9 @@ export default function TransactionsPage() {
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>New Transaction</DialogTitle>
+                  <DialogDescription>
+                    Create a new transaction to track your income or expenses.
+                  </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
                   <form
