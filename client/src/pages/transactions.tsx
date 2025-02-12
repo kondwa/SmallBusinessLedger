@@ -69,6 +69,7 @@ export default function TransactionsPage() {
       categoryId: 0,
       date: new Date(),
       currency: user?.defaultCurrency || "USD",
+      userId: user?.id,
     },
   });
 
