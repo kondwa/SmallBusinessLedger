@@ -99,17 +99,6 @@ export default function CategoriesPage() {
   });
 
   const handleSubmit = form.handleSubmit((data) => {
-    console.log("Form submitted with data:", data);
-    console.log("Form validation state:", form.formState);
-    toast({
-      title: "Debug",
-      description: "Form submitted with data: " + JSON.stringify(data),
-    });
-    if (form.formState.errors) {
-      console.log("Form errors:", form.formState.errors);
-      return;
-    }
-
     createCategory.mutate(data as { name: string; type: "income" | "expense" });
   });
 
