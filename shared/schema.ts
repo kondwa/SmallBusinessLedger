@@ -1,4 +1,11 @@
-import { pgTable, text, serial, integer, decimal, timestamp } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  serial,
+  integer,
+  decimal,
+  timestamp,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -41,7 +48,15 @@ export const invoices = pgTable("invoices", {
 
 // List of supported currencies
 export const SUPPORTED_CURRENCIES = [
-  "USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "CNY", "INR"
+  "USD",
+  "EUR",
+  "GBP",
+  "JPY",
+  "AUD",
+  "CAD",
+  "CHF",
+  "CNY",
+  "INR",
 ] as const;
 
 export const insertUserSchema = createInsertSchema(users).extend({
@@ -54,38 +69,37 @@ export const insertCategorySchema = createInsertSchema(categories).extend({
   type: z.enum(["income", "expense"], {
     required_error: "Type must be either income or expense",
   }),
+  userId: z.number().int().positive(),
 });
 
-export const insertTransactionSchema = createInsertSchema(transactions)
-  .extend({
-    // Ensure amount is handled as a decimal string
-    amount: z.string().transform((val) => val.toString()),
-    // Ensure categoryId is a number
-    categoryId: z.number().int().positive(),
-    // Ensure date is properly handled
-    date: z.coerce.date(),
-    // Validate transaction type
-    type: z.enum(["income", "expense"]),
-    // Validate currency
-    currency: z.enum(SUPPORTED_CURRENCIES)
-  });
+export const insertTransactionSchema = createInsertSchema(transactions).extend({
+  // Ensure amount is handled as a decimal string
+  amount: z.string().transform((val) => val.toString()),
+  // Ensure categoryId is a number
+  categoryId: z.number().int().positive(),
+  // Ensure date is properly handled
+  date: z.coerce.date(),
+  // Validate transaction type
+  type: z.enum(["income", "expense"]),
+  // Validate currency
+  currency: z.enum(SUPPORTED_CURRENCIES),
+});
 
-export const insertInvoiceSchema = createInsertSchema(invoices)
-  .extend({
-    // Ensure amount is handled as a decimal string
-    amount: z.string().transform((val) => val.toString()),
-    // Ensure dates are properly handled
-    dueDate: z.coerce.date(),
-    createdAt: z.coerce.date(),
-    // Validate status
-    status: z.enum(["paid", "pending", "overdue"]),
-    // Validate currency
-    currency: z.enum(SUPPORTED_CURRENCIES)
-  });
+export const insertInvoiceSchema = createInsertSchema(invoices).extend({
+  // Ensure amount is handled as a decimal string
+  amount: z.string().transform((val) => val.toString()),
+  // Ensure dates are properly handled
+  dueDate: z.coerce.date(),
+  createdAt: z.coerce.date(),
+  // Validate status
+  status: z.enum(["paid", "pending", "overdue"]),
+  // Validate currency
+  currency: z.enum(SUPPORTED_CURRENCIES),
+});
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type Category = typeof categories.$inferSelect;
 export type Transaction = typeof transactions.$inferSelect;
 export type Invoice = typeof invoices.$inferSelect;
-export type SupportedCurrency = typeof SUPPORTED_CURRENCIES[number];
+export type SupportedCurrency = (typeof SUPPORTED_CURRENCIES)[number];

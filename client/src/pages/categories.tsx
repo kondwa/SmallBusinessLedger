@@ -100,10 +100,13 @@ export default function CategoriesPage() {
 
   const handleSubmit = form.handleSubmit(
     (data) => {
+      if (!user) {
+        throw new Error("You must be logged in to create categories");
+      }
       const categoryData = {
         name: data.name,
         type: data.type,
-        userId: user?.id
+        userId: user.id,
       };
       createCategory.mutate(categoryData);
     },
