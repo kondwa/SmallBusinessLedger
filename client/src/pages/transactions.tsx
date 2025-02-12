@@ -21,6 +21,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -73,8 +74,12 @@ export default function TransactionsPage() {
 
   const createTransaction = useMutation({
     mutationFn: async (data: Omit<Transaction, "id" | "userId">) => {
+      if (!user) {
+        throw new Error("You must be logged in to create categories");
+      }
       const formattedData = {
         ...data,
+        userId: user.id,
         date: new Date(data.date), // Ensure date is properly formatted
         amount: data.amount.toString(), // Ensure amount is string
       };
@@ -90,7 +95,13 @@ export default function TransactionsPage() {
 
   // Watch the transaction type to filter categories
   const transactionType = form.watch("type");
-  const filteredCategories = categories.filter((c) => c.type === transactionType);
+  const handleSubmit = form.handleSubmit(
+    (data) => createTransaction.mutate(data),
+    (errors) => console.log("Form errors:", errors),
+  );
+  const filteredCategories = categories.filter(
+    (c) => c.type === transactionType,
+  );
 
   if (transactionsLoading || categoriesLoading) {
     return (
@@ -107,7 +118,9 @@ export default function TransactionsPage() {
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">Transactions</h1>
+              <h1 className="text-3xl font-bold tracking-tight">
+                Transactions
+              </h1>
               <p className="text-muted-foreground">Manage your transactions</p>
             </div>
             <Dialog open={open} onOpenChange={setOpen}>
@@ -125,12 +138,7 @@ export default function TransactionsPage() {
                   </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
-                  <form
-                    onSubmit={form.handleSubmit((data) =>
-                      createTransaction.mutate(data)
-                    )}
-                    className="space-y-4"
-                  >
+                  <form onSubmit={handleSubmit} className="space-y-4">
                     <FormField
                       control={form.control}
                       name="type"
@@ -243,7 +251,11 @@ export default function TransactionsPage() {
                             <Input
                               type="date"
                               {...field}
-                              value={field.value instanceof Date ? field.value.toISOString().split('T')[0] : field.value}
+                              value={
+                                field.value instanceof Date
+                                  ? field.value.toISOString().split("T")[0]
+                                  : field.value
+                              }
                             />
                           </FormControl>
                           <FormMessage />
@@ -294,8 +306,10 @@ export default function TransactionsPage() {
                     </TableCell>
                     <TableCell>{transaction.description}</TableCell>
                     <TableCell>
-                      {categories.find((c) => c.id === transaction.categoryId)
-                        ?.name}
+                      {
+                        categories.find((c) => c.id === transaction.categoryId)
+                          ?.name
+                      }
                     </TableCell>
                     <TableCell className="capitalize">
                       {transaction.type}

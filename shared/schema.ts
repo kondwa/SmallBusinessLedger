@@ -57,6 +57,7 @@ export const SUPPORTED_CURRENCIES = [
   "CHF",
   "CNY",
   "INR",
+  "MWK",
 ] as const;
 
 export const insertUserSchema = createInsertSchema(users).extend({
@@ -77,6 +78,8 @@ export const insertTransactionSchema = createInsertSchema(transactions).extend({
   amount: z.string().transform((val) => val.toString()),
   // Ensure categoryId is a number
   categoryId: z.number().int().positive(),
+  // Ensure userId is a number
+  userId: z.number().int().positive(),
   // Ensure date is properly handled
   date: z.coerce.date(),
   // Validate transaction type
