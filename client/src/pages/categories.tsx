@@ -100,7 +100,12 @@ export default function CategoriesPage() {
 
   const handleSubmit = form.handleSubmit(
     (data) => {
-      createCategory.mutate(data as { name: string; type: string });
+      const categoryData = {
+        name: data.name,
+        type: data.type,
+        userId: user?.id
+      };
+      createCategory.mutate(categoryData);
     },
     (errors) => {
       console.log("Form errors:", errors);
